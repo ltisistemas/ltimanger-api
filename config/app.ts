@@ -232,3 +232,4 @@ export const profiler: ProfilerConfig = {
 |
 */
 export const validator: ValidatorConfig = {}
+export const jwtKey: string = '8CE9EE0e7F4adF56dE64C6FcB722Dbe8'

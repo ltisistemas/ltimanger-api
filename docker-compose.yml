@@ -1,0 +1,35 @@
+version: "3.8"
+services:
+  api:
+    build: .
+    container_name: api
+    ports:
+      - "8001:3333"
+    restart: unless-stopped
+    command: yarn dev
+    volumes:
+      - ./:/api
+    depends_on:
+      - db
+    networks:
+      - lti_network
+  db:
+    image: mysql:8.0.23
+    container_name: db
+    environment:
+      MYSQL_DATABASE: ltimanger
+      MYSQL_ROOT_PASSWORD: 7hoCenezOsod3lspuspeSwlphuBRat
+      MYSQL_PASSWORD: 7hoCenezOsod3lspuspeSwlphuBRat
+      MYSQL_USER: ltisistemas
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - ./.docker/mysql:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - lti_network
+    command: --default-authentication-plugin=mysql_native_password
+networks:
+  lti_network:
+    driver: bridge

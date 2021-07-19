@@ -26,8 +26,12 @@
     "@adonisjs/core": "^5.1.0",
     "@adonisjs/lucid": "^15.0.3",
     "@adonisjs/repl": "^3.0.0",
+    "jsonwebtoken": "^8.5.1",
     "luxon": "^1.28.0",
     "mysql": "^2.18.1",
+    "mysql2": "^2.2.5",
+    "phc-argon2": "^1.1.2",
+    "phc-bcrypt": "^1.0.7",
     "proxy-addr": "^2.0.7",
     "reflect-metadata": "^0.1.13",
     "source-map-support": "^0.5.19"

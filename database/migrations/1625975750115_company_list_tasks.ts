@@ -6,11 +6,11 @@ export default class CompanyListTasks extends BaseSchema {
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
-      table.bigInteger('company_list_id').unsigned().references('company_lists.id')
-      table.bigInteger('company_user_create_id').unsigned().references('company_users.id')
-      table.bigInteger('company_user_updated_id').unsigned().references('company_users.id')
+      table.bigInteger('company_list_id').unsigned()
+      table.bigInteger('company_user_create_id').unsigned()
+      table.bigInteger('company_user_updated_id').unsigned()
       table.string('title')
-      table.string('description').nullable()
+      table.text('description').nullable()
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

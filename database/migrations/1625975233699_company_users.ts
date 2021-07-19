@@ -6,9 +6,9 @@ export default class CompanyUsers extends BaseSchema {
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
-      table.bigInteger('company_id').unsigned().references('companys.id')
+      table.bigInteger('company_id').unsigned()
       table.string('name')
-      table.string('email')
+      table.string('email').unique()
       table.string('password')
       table.string('reset_token')
       table.enum('profile', ['COMPANY_ADMIN', 'COMPANY_USER']).defaultTo('COMPANY_ADMIN').nullable()

@@ -1,0 +1,47 @@
+import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import Hash from '@ioc:Adonis/Core/Hash'
+import Controller from 'App/Controllers/Http/Controller'
+
+export default class LoginController extends Controller {
+  public async store({ request: req, response: res }: HttpContextContract) {
+    const { default: UserDaoController } = await import(
+      'App/Controllers/Http/DAO/UserDaoController'
+    )
+
+    const { email, password } = req.body()
+    const dao = new UserDaoController()
+
+    const user = await dao.show(0, email)
+    if (!user) {
+      return res.status(401).json({
+        status: 'error',
+        code: 401,
+        message: 'User / Password not found',
+        data: {},
+      })
+    }
+
+    if (!(await Hash.verify(user.senha, password))) {
+      return res.status(401).json({
+        status: 'error',
+        code: 401,
+        message: 'User / Password not found',
+        data: {},
+      })
+    }
+
+    delete user.senha
+    const payload = {
+      iat: Math.floor(Date.now() / 1000) - 30,
+      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 12,
+      sub: user.codigo,
+    }
+    const token = this.jwtEncode(payload)
+    user.token = token
+
+    return res.json(user)
+  }
+
+  // public async destroy ({}: HttpContextContract) {
+  // }
+}

@@ -1,12 +1,13 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 
-export default class Companys extends BaseSchema {
-  protected tableName = 'companys'
+export default class Configurations extends BaseSchema {
+  protected tableName = 'configurations'
 
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
-      table.string('alias')
+      table.enum('status', ['ACTIVE', 'INATIVE']).defaultTo('ACTIVE').nullable()
+      table.string('default_list').defaultTo('BACKLOG|TO DO|IN PROGRESS|REVIEW / QA|DONE').nullable()
       table.string('razao').nullable()
       table.string('fantasia').nullable()
       table.string('cnpj_cpf').nullable()
@@ -22,12 +23,10 @@ export default class Companys extends BaseSchema {
       table.string('state_name').nullable()
       table.string('incricao_estadual').nullable()
       table.string('incricao_municipal').nullable()
-      table.enum('status', ['ACTIVE', 'INATIVE', 'PENDING']).defaultTo('ACTIVE').nullable()
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */
-      table.timestamp('deleted_at', { useTz: true })
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
     })
