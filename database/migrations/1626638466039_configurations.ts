@@ -3,11 +3,14 @@ import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 export default class Configurations extends BaseSchema {
   protected tableName = 'configurations'
 
-  public async up () {
+  public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
       table.enum('status', ['ACTIVE', 'INATIVE']).defaultTo('ACTIVE').nullable()
-      table.string('default_list').defaultTo('BACKLOG|TO DO|IN PROGRESS|REVIEW / QA|DONE').nullable()
+      table
+        .string('default_list')
+        .defaultTo('BACKLOG|TO DO|ACTIVE|IMPEDIMENT|REVIEW / QA|RETURN|DONE')
+        .nullable()
       table.string('razao').nullable()
       table.string('fantasia').nullable()
       table.string('cnpj_cpf').nullable()
@@ -32,7 +35,7 @@ export default class Configurations extends BaseSchema {
     })
   }
 
-  public async down () {
+  public async down() {
     this.schema.dropTable(this.tableName)
   }
 }

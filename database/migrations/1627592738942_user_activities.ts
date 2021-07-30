@@ -1,17 +1,17 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 
-export default class CompanyListTaskUsers extends BaseSchema {
-  protected tableName = 'company_list_task_users'
+export default class UserActivities extends BaseSchema {
+  protected tableName = 'user_activities'
 
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
       table.bigInteger('company_user_id').unsigned().references('id').inTable('company_users')
-      table
-        .bigInteger('company_list_task_id')
-        .unsigned()
-        .references('id')
-        .inTable('company_list_tasks')
+      table.timestamp('activity_date', { useTz: true })
+      table.string('start_hour')
+      table.string('finish_hour')
+      table.text('notes').nullable()
+      table.enum('status', ['APPROVED', 'DISAPPROVED', 'PENDING']).defaultTo('PENDING').nullable()
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

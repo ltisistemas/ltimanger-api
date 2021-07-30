@@ -3,12 +3,20 @@ import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 export default class CompanyBoards extends BaseSchema {
   protected tableName = 'company_boards'
 
-  public async up () {
+  public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
-      table.bigInteger('company_id').unsigned()
-      table.bigInteger('company_user_create_id').unsigned()
-      table.bigInteger('company_user_updated_id').unsigned()
+      table.bigInteger('company_id').unsigned().references('id').inTable('companys')
+      table
+        .bigInteger('company_user_created_id')
+        .unsigned()
+        .references('id')
+        .inTable('company_users')
+      table
+        .bigInteger('company_user_updated_id')
+        .unsigned()
+        .references('id')
+        .inTable('company_users')
       table.string('title')
       table.text('description').nullable()
 
@@ -20,7 +28,7 @@ export default class CompanyBoards extends BaseSchema {
     })
   }
 
-  public async down () {
+  public async down() {
     this.schema.dropTable(this.tableName)
   }
 }

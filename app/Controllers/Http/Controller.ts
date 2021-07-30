@@ -8,7 +8,6 @@ export default class Controller {
     return token
   }
   public jwtDecode(token: string) {
-    // console.log(token, jwtKey)
     const payload = Jwt.verify(token, jwtKey)
 
     return payload

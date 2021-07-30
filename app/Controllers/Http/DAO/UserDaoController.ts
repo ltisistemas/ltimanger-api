@@ -1,4 +1,6 @@
 import Database from '@ioc:Adonis/Lucid/Database'
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 
 export default class UserDaoController {
   // public async qtdTotal(fields: any) {
@@ -26,21 +28,20 @@ export default class UserDaoController {
   }
 
   public async store(fields: any) {
+    const { name, email, password, profile } = fields
+
     const params = {
-      name: fields.name,
-      email: fields.email,
-      password: fields.password,
-      profile: fields.profile,
+      name,
+      email,
+      password,
+      profile,
+      created_at: format(new Date(), 'yyyy-MM-dd HH:mm:ss', { locale: ptBR }),
+      updated_at: format(new Date(), 'yyyy-MM-dd HH:mm:ss', { locale: ptBR }),
     }
 
-    let sql = `CALL sp_usuario_inclusao(:name, :email, :profile, :password);`
-
     try {
-      const row: any = await Database.rawQuery(sql, params)
-      const result = isNaN(+row[0][0][0].Result_Transaction)
-        ? false
-        : row[0][0][0].Result_Transaction
-      return result
+      const userId = await Database.table('users').returning('id').insert(params)
+      return userId
     } catch (e) {
       console.log('> Erro: ', e)
       return null
@@ -48,14 +49,13 @@ export default class UserDaoController {
   }
 
   public async show(id = 0, email_exact = '', email = '') {
-    const row: any[] = await this.index({ id, email_exact, email, start: 0, limit: 1 })
-    const result: any[] = row[0][0]
-    return result.length ? result[0] : null
-  }
+    const params = {}
 
-  // public async edit({}: HttpContextContract) {}
-  //
-  // public async update({}: HttpContextContract) {}
-  //
-  // public async destroy({}: HttpContextContract) {}
+    if (id !== 0) params['id'] = id
+    if (email_exact !== '') params['email'] = email_exact
+    if (email !== '') params['email'] = email
+
+    const row: any[] = await Database.from('users').where(params)
+    return row.length ? row[0] : null
+  }
 }

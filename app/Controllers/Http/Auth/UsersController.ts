@@ -1,15 +1,9 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Hash from '@ioc:Adonis/Core/Hash'
 import Controller from 'App/Controllers/Http/Controller'
+import * as bcrypt from 'bcrypt'
 
 export default class UsersController extends Controller {
   protected tableName = 'users'
-
-  // public async index ({}: HttpContextContract) {
-  // }
-  //
-  // public async create ({}: HttpContextContract) {
-  // }
 
   public async store({ request: req, response: res }: HttpContextContract) {
     const { default: UserDaoController } = await import(
@@ -17,26 +11,30 @@ export default class UsersController extends Controller {
     )
 
     const { name, email, password: pass, profile } = req.body()
-    const password = await Hash.make(pass)
-
     const dao = new UserDaoController()
-    const idTransaction = await dao.store({ name, email, password, profile })
+
+    const check = await dao.show(0, email)
+    if (check) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'email has exists',
+        data: [],
+        code: 400,
+      })
+    }
+
+    const salt = bcrypt.genSaltSync(10)
+    const password = bcrypt.hashSync(pass, salt) // await Hash.make(pass)
+    const idTransaction = parseInt((await dao.store({ name, email, password, profile }))[0], 10)
 
     const user = await dao.show(idTransaction)
-    delete user.senha
+    delete user.password
 
-    return res.json(user)
+    return res.json({
+      status: 'success',
+      message: 'User created successly',
+      data: user,
+      code: 200,
+    })
   }
-
-  // public async show ({}: HttpContextContract) {
-  // }
-  //
-  // public async edit ({}: HttpContextContract) {
-  // }
-  //
-  // public async update ({}: HttpContextContract) {
-  // }
-  //
-  // public async destroy ({}: HttpContextContract) {
-  // }
 }

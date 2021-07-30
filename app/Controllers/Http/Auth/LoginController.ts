@@ -1,6 +1,6 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Hash from '@ioc:Adonis/Core/Hash'
 import Controller from 'App/Controllers/Http/Controller'
+import * as bcrypt from 'bcrypt'
 
 export default class LoginController extends Controller {
   public async store({ request: req, response: res }: HttpContextContract) {
@@ -21,7 +21,8 @@ export default class LoginController extends Controller {
       })
     }
 
-    if (!(await Hash.verify(user.senha, password))) {
+    // if (!(await Hash.verify(user.senha, password))) {
+    if (!bcrypt.compareSync(password, user.password)) {
       return res.status(401).json({
         status: 'error',
         code: 401,
@@ -30,7 +31,7 @@ export default class LoginController extends Controller {
       })
     }
 
-    delete user.senha
+    delete user.password
     const payload = {
       iat: Math.floor(Date.now() / 1000) - 30,
       exp: Math.floor(Date.now() / 1000) + 60 * 60 * 12,
@@ -39,7 +40,12 @@ export default class LoginController extends Controller {
     const token = this.jwtEncode(payload)
     user.token = token
 
-    return res.json(user)
+    return res.json({
+      status: 'success',
+      message: 'Loggin success',
+      data: user,
+      code: 200,
+    })
   }
 
   // public async destroy ({}: HttpContextContract) {
