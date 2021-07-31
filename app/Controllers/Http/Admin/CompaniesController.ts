@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Controller from 'App/Controllers/Http/Controller'
 
 export default class CompaniesController {
   protected tableName = 'companys'
