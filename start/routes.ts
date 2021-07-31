@@ -29,6 +29,10 @@ Route.group(() => {
 
   Route.group(() => {
     Route.resource('users', 'Auth/UsersController')
+
+    Route.group(() => {
+      Route.resource('companies', 'Admin/CompaniesController')
+    }).prefix('admin')
   })
     .middleware('auth')
     .prefix('auth')
