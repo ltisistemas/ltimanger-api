@@ -17,7 +17,7 @@ const bodyParserConfig: BodyParserConfig = {
   | to avoid body parsing for `GET` requests.
   |
   */
-  whitelistedMethods: ['POST', 'PUT', 'PATCH', 'DELETE'],
+  whitelistedMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
 
   /*
   |--------------------------------------------------------------------------
@@ -37,6 +37,7 @@ const bodyParserConfig: BodyParserConfig = {
       'application/json-patch+json',
       'application/vnd.api+json',
       'application/csp-report',
+      'application/x-www-form-urlencoded',
     ],
   },
 
