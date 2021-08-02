@@ -9,7 +9,8 @@ export default class CompaniesController {
       'App/Controllers/Http/DAO/CompanyDaosController'
     )
 
-    const { id } = req.body()
+    // const { id } = req.body()
+    const { id } = req.qs()
 
     const dao = new CompanyDaosController()
     const list = await dao.index(id)
@@ -19,8 +20,10 @@ export default class CompaniesController {
       status: 'success',
       message: 'Operation success',
       code: 200,
-      totalRecords: qtd,
+      totalCount: qtd,
+      summary: [15],
       data: list,
+      v: req.qs()
     })
   }
   public async store({ request: req, response: res }: HttpContextContract) {
