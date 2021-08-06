@@ -32,7 +32,13 @@ Route.group(() => {
 
     Route.group(() => {
       Route.resource('companies', 'Admin/CompaniesController')
+      Route.resource('companie-users', 'Admin/CompanieUsersController')
     }).prefix('admin')
+
+    /**
+     * @todo Default Kanban Routes
+     */
+    Route.resource('board', 'Kanban/CompanieBoardController')
   })
     .middleware('auth')
     .prefix('auth')

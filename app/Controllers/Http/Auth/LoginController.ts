@@ -7,18 +7,25 @@ export default class LoginController extends Controller {
     const { default: UserDaoController } = await import(
       'App/Controllers/Http/DAO/UserDaoController'
     )
+    const { default: CompanyUserDaosController } = await import(
+      'App/Controllers/Http/DAO/CompanyUserDaosController'
+    )
 
     const { email, password } = req.body()
     const dao = new UserDaoController()
 
-    const user = await dao.show(0, email)
+    let user = await dao.show(0, email)
     if (!user) {
-      return res.status(401).json({
-        status: 'error',
-        code: 401,
-        message: 'User / Password not found',
-        data: {},
-      })
+      const daoCompanyUser = new CompanyUserDaosController()
+      user = await daoCompanyUser.show(0, email)
+      if (!user) {
+        return res.status(401).json({
+          status: 'error',
+          code: 401,
+          message: 'User / Password not found',
+          data: {},
+        })
+      }
     }
 
     // if (!(await Hash.verify(user.senha, password))) {

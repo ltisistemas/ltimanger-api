@@ -7,9 +7,9 @@ export default class CompanyUsers extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
       table.bigInteger('company_id').unsigned().references('id').inTable('companys')
-      table.string('contract_number')
-      table.timestamp('contract_start_date', { useTz: true })
-      table.timestamp('contract_finish_date', { useTz: true })
+      table.string('contract_number').nullable()
+      table.timestamp('contract_start_date', { useTz: true }).nullable()
+      table.timestamp('contract_finish_date', { useTz: true }).nullable()
       table.enum('contract_type', ['PJ', 'CLT', 'FREELA']).defaultTo('PJ').nullable()
       table.string('name')
       table.string('email').unique()

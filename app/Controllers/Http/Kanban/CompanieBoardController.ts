@@ -1,20 +1,19 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
-export default class CompaniesController {
+export default class CompanieBoardController {
   protected tableName = 'companys'
 
   public async index({ request: req, response: res }: HttpContextContract) {
-    const { default: CompanyDaosController } = await import(
-      'App/Controllers/Http/DAO/CompanyDaosController'
+    const { default: CompanyBoardDaoController } = await import(
+      'App/Controllers/Http/DAO/CompanyBoardDaoController'
     )
 
-    // const { id } = req.body()
-    const { id } = req.qs()
+    const { id, company_id } = req.qs()
 
-    const dao = new CompanyDaosController()
-    const list = await dao.index(id)
-    const qtd = (await dao.counted(id))[0].count
+    const dao = new CompanyBoardDaoController()
+    const list = await dao.index(id, company_id)
+    const qtd = (await dao.counted(id, company_id))[0].count
 
     return res.json({
       status: 'success',
@@ -26,63 +25,64 @@ export default class CompaniesController {
       v: req.qs(),
     })
   }
-  public async store({ request: req, response: res }: HttpContextContract) {
-    const { default: CompanyDaosController } = await import(
-      'App/Controllers/Http/DAO/CompanyDaosController'
+  public async store(ctx: HttpContextContract) {
+    const { request: req, response: res, user } = ctx
+
+    const { default: CompanyBoardDaoController } = await import(
+      'App/Controllers/Http/DAO/CompanyBoardDaoController'
+    )
+    const { default: CompanyBoardListDaoController } = await import(
+      'App/Controllers/Http/DAO/CompanyBoardListDaoController'
+    )
+    const { default: ConfigurationDaoController } = await import(
+      'App/Controllers/Http/DAO/ConfigurationDaoController'
     )
 
-    const {
-      alias,
-      razao,
-      fantasia,
-      cnpj_cpf,
-      zipcode,
-      street,
-      number,
-      complement,
-      neighborhood,
-      city_code,
-      city_name,
-      state_uf,
-      state_code,
-      state_name,
-      incricao_estadual,
-      incricao_municipal,
-    } = req.body()
+    try {
+      const { company_id, title, description } = req.body()
+      const company_user_created_id = parseInt(user.id, 10)
+      const companyId = parseInt(company_id, 10)
 
-    const dao = new CompanyDaosController()
-    const idTransaction = parseInt(
-      (
-        await dao.store({
-          alias,
-          razao,
-          fantasia,
-          cnpj_cpf,
-          zipcode,
-          street,
-          number,
-          complement,
-          neighborhood,
-          city_code,
-          city_name,
-          state_uf,
-          state_code,
-          state_name,
-          incricao_estadual,
-          incricao_municipal,
+      const dao = new CompanyBoardDaoController()
+      const idTransaction = parseInt(
+        (
+          await dao.store({
+            companyId,
+            company_user_created_id,
+            title,
+            description,
+          })
+        )[0],
+        10
+      )
+
+      const finded = await dao.show(idTransaction)
+      if (finded) {
+        const daoConfig = new ConfigurationDaoController()
+        const listConfig = await daoConfig.index()
+        const config = listConfig[0]
+        const lists: any[] = config.default_list.split('|')
+        lists.map(async (title: any) => {
+          const daoList = new CompanyBoardListDaoController()
+          await daoList.store({ company_board_id: idTransaction, company_user_created_id, title })
         })
-      )[0],
-      10
-    )
+      }
 
-    const company = await dao.show(idTransaction)
-
-    return res.json({
-      status: 'success',
-      message: 'Company created successly',
-      data: company,
-      code: 200,
-    })
+      return res.json({
+        status: 'success',
+        message: 'Operation success',
+        data: finded,
+        code: 200,
+      })
+    } catch (error) {
+      console.log('> Error: ', error)
+      return res.status(400).json({
+        status: 'error',
+        message: 'Operation fail',
+        data: error,
+        code: 400,
+      })
+    }
   }
   public async update({ request: req, response: res, params }: HttpContextContract) {
     const { default: CompanyDaosController } = await import(

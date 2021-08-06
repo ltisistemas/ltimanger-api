@@ -19,6 +19,7 @@ export default class CompanyBoards extends BaseSchema {
         .inTable('company_users')
       table.string('title')
       table.text('description').nullable()
+      table.enum('status', ['ACTIVE', 'INACTIVE']).defaultTo('ACTIVE').nullable()
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
