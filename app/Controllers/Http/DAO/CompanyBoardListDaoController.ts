@@ -62,20 +62,22 @@ export default class CompanyBoardListDaoController {
     }
   }
 
-  public async index(id = 0, company_id: number) {
+  public async index(id = 0, company_board_id = 0, title = '') {
     const params = {}
 
     if (id !== 0) params['id'] = id
-    params['company_id'] = company_id
+    if (company_board_id !== 0) params['company_board_id'] = company_board_id
+    if (title !== '') params['title'] = title
 
     return await Database.from(this.tableName).where(params)
   }
 
-  public async counted(id = 0, company_id: number) {
+  public async counted(id = 0, company_board_id = 0, title = '') {
     const params = {}
 
     if (id !== 0) params['id'] = id
-    params['company_id'] = company_id
+    if (company_board_id !== 0) params['company_board_id'] = company_board_id
+    if (title !== '') params['title'] = title
 
     return Database.from(this.tableName).where(params).count('*')
   }

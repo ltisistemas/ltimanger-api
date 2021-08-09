@@ -47,7 +47,7 @@ export default class CompanieBoardController {
       const idTransaction = parseInt(
         (
           await dao.store({
-            companyId,
+            company_id: companyId,
             company_user_created_id,
             title,
             description,

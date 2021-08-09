@@ -38,7 +38,8 @@ Route.group(() => {
     /**
      * @todo Default Kanban Routes
      */
-    Route.resource('board', 'Kanban/CompanieBoardController')
+    Route.resource('boards', 'Kanban/CompanieBoardController')
+    Route.resource('board-lists', 'Kanban/CompanieBoardListController')
   })
     .middleware('auth')
     .prefix('auth')
