@@ -10,8 +10,9 @@ export default class CompanieBoardListController {
     try {
       const id = req.qs().hasOwnProperty('id') ? req.qs().id : 0
       const title = req.qs().hasOwnProperty('title') ? req.qs().title : ''
-      const company_board_id = req.qs().hasOwnProperty('company_board_id') ? req.qs().company_board_id : 0
-      console.log(id, company_board_id, title)
+      const company_board_id = req.qs().hasOwnProperty('company_board_id')
+        ? req.qs().company_board_id
+        : 0
 
       const dao = new CompanyBoardListDaoController()
       const list = await dao.index(id, company_board_id, title)

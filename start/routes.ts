@@ -40,6 +40,7 @@ Route.group(() => {
      */
     Route.resource('boards', 'Kanban/CompanieBoardController')
     Route.resource('board-lists', 'Kanban/CompanieBoardListController')
+    Route.resource('board-lists-tasks', 'Kanban/CompanyBoardListTaskController')
   })
     .middleware('auth')
     .prefix('auth')
