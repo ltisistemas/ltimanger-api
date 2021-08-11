@@ -25,10 +25,10 @@ export default class UsersController extends Controller {
 
     const salt = bcrypt.genSaltSync(10)
     const password = bcrypt.hashSync(pass, salt) // await Hash.make(pass)
-    const idTransaction = parseInt((await dao.store({ name, email, password, profile }))[0], 10)
+    const idTransaction = await dao.store({ name, email, password, profile })
 
     const user = await dao.show(idTransaction)
-    delete user.password
+    if (user) delete user.password
 
     return res.json({
       status: 'success',

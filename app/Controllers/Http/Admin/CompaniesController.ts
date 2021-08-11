@@ -6,7 +6,7 @@ export default class CompaniesController {
 
   public async index({ request: req, response: res }: HttpContextContract) {
     const { default: CompanyDaosController } = await import(
-      'App/Controllers/Http/DAO/CompanyDaosController'
+      'App/Controllers/Http/DAO/CompanyDaoController'
     )
 
     // const { id } = req.body()
@@ -28,7 +28,7 @@ export default class CompaniesController {
   }
   public async store({ request: req, response: res }: HttpContextContract) {
     const { default: CompanyDaosController } = await import(
-      'App/Controllers/Http/DAO/CompanyDaosController'
+      'App/Controllers/Http/DAO/CompanyDaoController'
     )
 
     const {
@@ -86,7 +86,7 @@ export default class CompaniesController {
   }
   public async update({ request: req, response: res, params }: HttpContextContract) {
     const { default: CompanyDaosController } = await import(
-      'App/Controllers/Http/DAO/CompanyDaosController'
+      'App/Controllers/Http/DAO/CompanyDaoController'
     )
 
     const { id: codigo } = params
@@ -158,7 +158,7 @@ export default class CompaniesController {
   }
   public async destroy({ request: req, response: res, params }: HttpContextContract) {
     const { default: CompanyDaosController } = await import(
-      'App/Controllers/Http/DAO/CompanyDaosController'
+      'App/Controllers/Http/DAO/CompanyDaoController'
     )
 
     const { id: codigo } = params

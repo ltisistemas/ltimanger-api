@@ -36,6 +36,7 @@ export default class Auth {
       ctx.user = user
       await next()
     } catch (e) {
+      console.log('> ', e)
       return res.status(401).json({ status: 'error', message: 'Auth invalid error' })
     }
   }

@@ -3,7 +3,7 @@ import Database from '@ioc:Adonis/Lucid/Database'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
-export default class CompanyDaosController {
+export default class CompanyDaoController {
   protected tableName = 'companys'
 
   public async store(fields: any) {

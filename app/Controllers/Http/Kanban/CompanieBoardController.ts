@@ -85,13 +85,13 @@ export default class CompanieBoardController {
     }
   }
   public async update({ request: req, response: res, params }: HttpContextContract) {
-    const { default: CompanyDaosController } = await import(
-      'App/Controllers/Http/DAO/CompanyDaosController'
+    const { default: CompanyDaoController } = await import(
+      'App/Controllers/Http/DAO/CompanyDaoController'
     )
 
     const { id: codigo } = params
     const id = parseInt(codigo, 10)
-    const dao = new CompanyDaosController()
+    const dao = new CompanyDaoController()
     const finded = await dao.show(id)
     if (!finded) {
       return res.status(400).json({
@@ -157,13 +157,13 @@ export default class CompanieBoardController {
     })
   }
   public async destroy({ request: req, response: res, params }: HttpContextContract) {
-    const { default: CompanyDaosController } = await import(
-      'App/Controllers/Http/DAO/CompanyDaosController'
+    const { default: CompanyDaoController } = await import(
+      'App/Controllers/Http/DAO/CompanyDaoController'
     )
 
     const { id: codigo } = params
     const id = parseInt(codigo, 10)
-    const dao = new CompanyDaosController()
+    const dao = new CompanyDaoController()
     const finded = await dao.show(id)
     if (!finded) {
       return res.status(400).json({

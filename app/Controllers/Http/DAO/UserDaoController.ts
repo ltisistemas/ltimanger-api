@@ -1,11 +1,11 @@
 import Database from '@ioc:Adonis/Lucid/Database'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import DaoMongoController from './DaoMongoController'
 
-export default class UserDaoController {
-  // public async qtdTotal(fields: any) {
-  //
-  // }
+export default class UserDaoController extends DaoMongoController {
+  protected tableName = 'users'
+
   public async index(fields: any) {
     const params = {
       id: fields.id ?? 0,
@@ -40,22 +40,25 @@ export default class UserDaoController {
     }
 
     try {
-      const userId = await Database.table('users').returning('id').insert(params)
-      return userId
+      // const userId = await Database.table('users').returning('id').insert(params)
+      const collection = await this.collection(this.tableName)
+      const result = await collection.insertOne(params)
+      return result.insertedId
     } catch (e) {
       console.log('> Erro: ', e)
       return null
     }
   }
 
-  public async show(id = 0, email_exact = '', email = '') {
+  public async show(id: any, email_exact: any = '', email: any = '') {
     const params = {}
 
-    if (id !== 0) params['id'] = id
-    if (email_exact !== '') params['email'] = email_exact
-    if (email !== '') params['email'] = email
+    if (id && id !== 0) params['_id'] = id
+    if (email_exact && email_exact !== '') params['email'] = email_exact
+    if (email && email !== '') params['email'] = email
 
-    const row: any[] = await Database.from('users').where(params)
-    return row.length ? row[0] : null
+    const collection = await this.collection(this.tableName)
+    const result = await collection.findOne(params)
+    return result && result !== undefined ? result : null
   }
 }

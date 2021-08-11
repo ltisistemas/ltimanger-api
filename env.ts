@@ -20,4 +20,7 @@ export default Env.rules({
   APP_KEY: Env.schema.string(),
   APP_NAME: Env.schema.string(),
   NODE_ENV: Env.schema.enum(['development', 'production', 'testing'] as const),
+  MONGODB_CONNECTION: Env.schema.string(),
+  MONGODB_URL: Env.schema.string(),
+  MONGODB_DATABASE: Env.schema.string(),
 })
