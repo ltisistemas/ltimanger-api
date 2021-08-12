@@ -1,14 +1,13 @@
 import { MongoClient } from 'mongodb'
 import Env from '@ioc:Adonis/Core/Env'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
 import * as mongo from 'mongodb'
-import * as bcrypt from 'bcrypt'
+import GlobalDaoController from './GlobalDaoController'
 
-export default class DaoMongoController {
+export default class DaoMongoController extends GlobalDaoController {
   protected client: MongoClient
 
   constructor() {
+    super()
     this.client = new MongoClient(Env.get('MONGODB_URL'))
   }
 
@@ -37,7 +36,6 @@ export default class DaoMongoController {
     const collection = await this.collection(tableName)
     const document = collection.findOne(params)
     const doc = await document
-    console.log('< doc', doc, params)
     return doc && doc !== undefined ? doc : null
   }
   public async insertDocument(tableName: string, params = {}) {
@@ -49,16 +47,5 @@ export default class DaoMongoController {
     const collection = await this.collection(tableName)
     const result = await collection.updateOne(filter, updateDocument)
     return result.modifiedCount
-  }
-  public toHash(hash: string) {
-    const salt = bcrypt.genSaltSync(10)
-    return bcrypt.hashSync(hash, salt)
-  }
-  public toDateTime(value: any = null) {
-    const entry = value && value !== undefined ? value : new Date()
-    return format(entry, 'yyyy-MM-dd HH:mm:ss', { locale: ptBR })
-  }
-  public doCompareHash(password, hash) {
-    return bcrypt.compareSync(password, hash)
   }
 }

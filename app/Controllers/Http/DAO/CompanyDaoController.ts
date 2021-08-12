@@ -1,59 +1,52 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import Database from '@ioc:Adonis/Lucid/Database'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
 import DaoMongoController from './DaoMongoController'
 
 export default class CompanyDaoController extends DaoMongoController {
   protected tableName = 'companys'
 
   public async store(fields: any) {
-    const {
-      alias,
-      razao,
-      fantasia,
-      cnpj_cpf,
-      zipcode,
-      street,
-      number,
-      complement,
-      neighborhood,
-      city_code,
-      city_name,
-      state_uf,
-      state_code,
-      state_name,
-      incricao_estadual,
-      incricao_municipal,
-    } = fields
-
-    const params = {
-      alias,
-      razao,
-      fantasia,
-      cnpj_cpf,
-      zipcode,
-      street,
-      number,
-      complement,
-      neighborhood,
-      city_code,
-      city_name,
-      state_uf,
-      state_code,
-      state_name,
-      incricao_estadual,
-      incricao_municipal,
-      created_at: format(new Date(), 'yyyy-MM-dd HH:mm:ss', { locale: ptBR }),
-      updated_at: format(new Date(), 'yyyy-MM-dd HH:mm:ss', { locale: ptBR }),
-    }
-
     try {
-      const collection = await this.collection(this.tableName)
-      const result = await collection.insertOne(params)
-      return result.insertedId
-      // const userId = await Database.table(this.tableName).returning('id').insert(params)
-      // return userId
+      const {
+        alias,
+        razao,
+        fantasia,
+        cnpj_cpf,
+        zipcode,
+        street,
+        number,
+        complement,
+        neighborhood,
+        city_code,
+        city_name,
+        state_uf,
+        state_code,
+        state_name,
+        incricao_estadual,
+        incricao_municipal,
+      } = fields
+
+      const params = {
+        alias,
+        razao,
+        fantasia,
+        cnpj_cpf,
+        zipcode,
+        street,
+        number,
+        complement,
+        neighborhood,
+        city_code,
+        city_name,
+        state_uf,
+        state_code,
+        state_name,
+        incricao_estadual,
+        incricao_municipal,
+        created_at: this.toDateTime(),
+        updated_at: this.toDateTime(),
+      }
+
+      return await this.insertDocument(this.tableName, params)
     } catch (e) {
       console.log('> Erro: ', e)
       return null
@@ -99,14 +92,10 @@ export default class CompanyDaoController extends DaoMongoController {
         state_name,
         incricao_estadual,
         incricao_municipal,
-        updated_at: format(new Date(), 'yyyy-MM-dd HH:mm:ss', { locale: ptBR }),
+        updated_at: this.toDateTime(),
       }
 
-      const collection = await this.collection(this.tableName)
-      const result = await collection.updateOne(filter, updateDocument)
-      return result.modifiedCount
-      // const affected = await Database.from(this.tableName).where('id', id).update(params, 'id')
-      // return affected.length
+      return await this.updateDocument(this.tableName, filter, updateDocument)
     } catch (e) {
       console.log('> Erro: ', e)
       return null
@@ -114,16 +103,16 @@ export default class CompanyDaoController extends DaoMongoController {
   }
 
   public async destroy(id: number, fields: any) {
-    const { status } = fields
-
-    const params = {
-      status,
-      updated_at: format(new Date(), 'yyyy-MM-dd HH:mm:ss', { locale: ptBR }),
-    }
-
     try {
-      const affected = await Database.from(this.tableName).where('id', id).update(params, 'id')
-      return affected.length
+      const { status, company_user_updated_id } = fields
+      const filter = { _id: this.toId(id) }
+      const updateDocument = {
+        company_user_updated_id: this.toId(company_user_updated_id),
+        status,
+        updated_at: this.toDateTime(),
+      }
+
+      return await this.updateDocument(this.tableName, filter, updateDocument)
     } catch (e) {
       console.log('> Erro: ', e)
       return null
@@ -136,14 +125,6 @@ export default class CompanyDaoController extends DaoMongoController {
     if (id || id !== undefined) params['_id'] = this.toId(id)
 
     return await this.getDocuments(this.tableName, params)
-  }
-
-  public async counted(id = 0) {
-    const params = {}
-
-    if (id !== 0) params['id'] = id
-
-    return Database.from(this.tableName).where(params).count('*')
   }
 
   public async show(id: any) {

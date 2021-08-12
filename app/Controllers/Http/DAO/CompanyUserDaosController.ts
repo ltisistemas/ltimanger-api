@@ -2,7 +2,6 @@
 import Database from '@ioc:Adonis/Lucid/Database'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import * as bcrypt from 'bcrypt'
 import DaoMongoController from './DaoMongoController'
 
 export default class CompanyUserDaosController extends DaoMongoController {
@@ -105,9 +104,8 @@ export default class CompanyUserDaosController extends DaoMongoController {
   public async index(id: any, company_id: any) {
     const params = {}
 
-    if (id || id !== undefined) params['_id'] = this.toId(id)
+    if (id || (id !== undefined && id !== 0)) params['_id'] = this.toId(id)
     params['company_id'] = this.toId(company_id)
-    console.log('> ', params)
 
     return await this.getDocuments(this.tableName, params)
   }
@@ -116,7 +114,7 @@ export default class CompanyUserDaosController extends DaoMongoController {
     const params = {}
 
     if (id !== 0) params['id'] = id
-    params['company_id'] = company_id
+    params['company_id'] = this.toId(company_id)
 
     return Database.from(this.tableName).where(params).count('*')
   }

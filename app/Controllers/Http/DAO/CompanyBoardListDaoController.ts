@@ -1,26 +1,23 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import Database from '@ioc:Adonis/Lucid/Database'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+import DaoMongoController from './DaoMongoController'
 
-export default class CompanyBoardListDaoController {
+export default class CompanyBoardListDaoController extends DaoMongoController {
   protected tableName = 'company_lists'
 
   public async store(fields: any) {
-    const { company_board_id, company_user_created_id, title } = fields
-
-    const params = {
-      company_board_id,
-      company_user_created_id,
-      company_user_updated_id: company_user_created_id,
-      title,
-      created_at: format(new Date(), 'yyyy-MM-dd HH:mm:ss', { locale: ptBR }),
-      updated_at: format(new Date(), 'yyyy-MM-dd HH:mm:ss', { locale: ptBR }),
-    }
-
     try {
-      const transactionId = await Database.table(this.tableName).returning('id').insert(params)
-      return transactionId
+      const { company_board_id, company_user_created_id, title } = fields
+
+      const params = {
+        company_board_id,
+        company_user_created_id: this.toId(company_user_created_id),
+        company_user_updated_id: this.toId(company_user_created_id),
+        title,
+        created_at: this.toDateTime(),
+        updated_at: this.toDateTime(),
+      }
+
+      return await this.insertDocument(this.tableName, params)
     } catch (e) {
       console.log('> Erro: ', e)
       return null
@@ -28,17 +25,17 @@ export default class CompanyBoardListDaoController {
   }
 
   public async update(id: number, fields: any) {
-    const { company_user_updated_id, title } = fields
-
-    const params = {
-      company_user_updated_id,
-      title,
-      updated_at: format(new Date(), 'yyyy-MM-dd HH:mm:ss', { locale: ptBR }),
-    }
-
     try {
-      const affected = await Database.from(this.tableName).where('id', id).update(params, 'id')
-      return affected.length
+      const { company_user_updated_id, title } = fields
+
+      const filter = { _id: this.toId(id) }
+      const params = {
+        company_user_updated_id: this.toId(company_user_updated_id),
+        title,
+        updated_at: this.toDateTime(),
+      }
+
+      return await this.updateDocument(this.tableName, filter, params)
     } catch (e) {
       console.log('> Erro: ', e)
       return null
@@ -46,49 +43,39 @@ export default class CompanyBoardListDaoController {
   }
 
   public async destroy(id: number, fields: any) {
-    const { status } = fields
-
-    const params = {
-      status,
-      updated_at: format(new Date(), 'yyyy-MM-dd HH:mm:ss', { locale: ptBR }),
-    }
-
     try {
-      const affected = await Database.from(this.tableName).where('id', id).update(params, 'id')
-      return affected.length
+      const { status, company_user_updated_id } = fields
+      const filter = { _id: this.toId(id) }
+      const updateDocument = {
+        company_user_updated_id: this.toId(company_user_updated_id),
+        status,
+        updated_at: this.toDateTime(),
+      }
+
+      return await this.updateDocument(this.tableName, filter, updateDocument)
     } catch (e) {
       console.log('> Erro: ', e)
       return null
     }
   }
 
-  public async index(id = 0, company_board_id = 0, title = '') {
+  public async index(id: any, company_id: any, title: any = '') {
     const params = {}
 
-    if (id !== 0) params['id'] = id
-    if (company_board_id !== 0) params['company_board_id'] = company_board_id
-    if (title !== '') params['title'] = title
+    if (id || (id !== undefined && id !== 0)) params['_id'] = this.toId(id)
+    params['company_id'] = this.toId(company_id)
+    if (title && title !== '') params['title'] = title
 
-    return await Database.from(this.tableName).where(params)
+    return await this.getDocuments(this.tableName, params)
   }
 
-  public async counted(id = 0, company_board_id = 0, title = '') {
+  public async show(id: any, company_id: any, title: any = '') {
     const params = {}
 
-    if (id !== 0) params['id'] = id
-    if (company_board_id !== 0) params['company_board_id'] = company_board_id
-    if (title !== '') params['title'] = title
+    if (id || (id !== undefined && id !== 0)) params['_id'] = this.toId(id)
+    if (company_id && company_id !== 0) params['company_id'] = this.toId(company_id)
+    if (title && title !== '') params['title'] = title
 
-    return Database.from(this.tableName).where(params).count('*')
-  }
-
-  public async show(id = 0, email = '') {
-    const params = {}
-
-    if (id !== 0) params['id'] = id
-    if (email !== '') params['email'] = email
-
-    const row: any[] = await Database.from(this.tableName).where(params)
-    return row.length ? row[0] : null
+    return await this.getDocument(this.tableName, params)
   }
 }
