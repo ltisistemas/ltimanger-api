@@ -39,22 +39,17 @@ export default class CompanieBoardController {
     )
 
     try {
-      const { company_id, title, description } = req.body()
+      const { company_id: companyId, title, description } = req.body()
       const company_user_created_id = parseInt(user.id, 10)
-      const companyId = parseInt(company_id, 10)
+      const company_id = parseInt(companyId, 10)
 
       const dao = new CompanyBoardDaoController()
-      const idTransaction = parseInt(
-        (
-          await dao.store({
-            company_id: companyId,
-            company_user_created_id,
-            title,
-            description,
-          })
-        )[0],
-        10
-      )
+      const idTransaction = await dao.store({
+        company_id,
+        company_user_created_id,
+        title,
+        description,
+      })
 
       const finded = await dao.show(idTransaction)
       if (finded) {

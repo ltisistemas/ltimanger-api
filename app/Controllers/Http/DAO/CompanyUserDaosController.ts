@@ -3,13 +3,12 @@ import Database from '@ioc:Adonis/Lucid/Database'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import * as bcrypt from 'bcrypt'
+import DaoMongoController from './DaoMongoController'
 
-export default class CompanyUserDaosController {
+export default class CompanyUserDaosController extends DaoMongoController {
   protected tableName = 'company_users'
 
   public async store(fields: any) {
-    const salt = bcrypt.genSaltSync(10)
-
     const {
       company_id,
       contract_number,
@@ -24,14 +23,14 @@ export default class CompanyUserDaosController {
     } = fields
 
     const params = {
-      company_id,
+      company_id: this.toId(company_id),
       name,
       email,
       cpf,
-      password: bcrypt.hashSync(pass, salt),
+      password: this.toHash(pass),
       profile,
-      created_at: format(new Date(), 'yyyy-MM-dd HH:mm:ss', { locale: ptBR }),
-      updated_at: format(new Date(), 'yyyy-MM-dd HH:mm:ss', { locale: ptBR }),
+      created_at: this.toDateTime(),
+      updated_at: this.toDateTime(),
     }
 
     if (contract_number !== '') params['contract_number'] = fields.contract_number
@@ -40,8 +39,7 @@ export default class CompanyUserDaosController {
     if (contract_type !== '') params['contract_type'] = fields.contract_type
 
     try {
-      const userId = await Database.table(this.tableName).returning('id').insert(params)
-      return userId
+      return await this.insertDocument(this.tableName, params)
     } catch (e) {
       console.log('> Erro: ', e)
       return null
@@ -75,12 +73,12 @@ export default class CompanyUserDaosController {
       password,
       profile,
       reset_token,
-      updated_at: format(new Date(), 'yyyy-MM-dd HH:mm:ss', { locale: ptBR }),
+      updated_at: this.toDateTime(),
     }
 
     try {
-      const affected = await Database.from(this.tableName).where('id', id).update(params, 'id')
-      return affected.length
+      const filter = { _id: this.toId(id) }
+      return await this.updateDocument(this.tableName, filter, params)
     } catch (e) {
       console.log('> Erro: ', e)
       return null
@@ -96,23 +94,22 @@ export default class CompanyUserDaosController {
     }
 
     try {
-      const affected = await Database.from(this.tableName).where('id', id).update(params, 'id')
-      return affected.length
+      const filter = { _id: this.toId(id) }
+      return await this.updateDocument(this.tableName, filter, params)
     } catch (e) {
       console.log('> Erro: ', e)
       return null
     }
   }
 
-  public async index(id = 0, company_id: number) {
+  public async index(id: any, company_id: any) {
     const params = {}
 
-    if (id !== 0) params['id'] = id
-    params['company_id'] = company_id
-    // if (email_exact !== '') params['email'] = email_exact
-    // if (email !== '') params['email'] = email
+    if (id || id !== undefined) params['_id'] = this.toId(id)
+    params['company_id'] = this.toId(company_id)
+    console.log('> ', params)
 
-    return await Database.from(this.tableName).where(params)
+    return await this.getDocuments(this.tableName, params)
   }
 
   public async counted(id = 0, company_id: number) {
@@ -124,14 +121,12 @@ export default class CompanyUserDaosController {
     return Database.from(this.tableName).where(params).count('*')
   }
 
-  public async show(id = 0, email = '') {
+  public async show(id: any, email: any = '') {
     const params = {}
 
-    if (id !== 0) params['id'] = id
-    // if (email_exact !== '') params['email'] = email_exact
-    if (email !== '') params['email'] = email
+    if (id || (id !== undefined && id !== 0)) params['_id'] = this.toId(id)
+    if (email && email !== '') params['email'] = email
 
-    const row: any[] = await Database.from(this.tableName).where(params)
-    return row.length ? row[0] : null
+    return this.getDocument(this.tableName, params)
   }
 }

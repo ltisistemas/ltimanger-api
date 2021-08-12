@@ -9,12 +9,11 @@ export default class CompaniesController {
       'App/Controllers/Http/DAO/CompanyDaoController'
     )
 
-    // const { id } = req.body()
     const { id } = req.qs()
 
     const dao = new CompanyDaosController()
-    const list = await dao.index(id)
-    const qtd = (await dao.counted(id))[0].count
+    const { list, counted: qtd } = await dao.index(id)
+    // const qtd = (await dao.counted(id))[0].count
 
     return res.json({
       status: 'success',
@@ -51,29 +50,24 @@ export default class CompaniesController {
     } = req.body()
 
     const dao = new CompanyDaosController()
-    const idTransaction = parseInt(
-      (
-        await dao.store({
-          alias,
-          razao,
-          fantasia,
-          cnpj_cpf,
-          zipcode,
-          street,
-          number,
-          complement,
-          neighborhood,
-          city_code,
-          city_name,
-          state_uf,
-          state_code,
-          state_name,
-          incricao_estadual,
-          incricao_municipal,
-        })
-      )[0],
-      10
-    )
+    const idTransaction = await dao.store({
+      alias,
+      razao,
+      fantasia,
+      cnpj_cpf,
+      zipcode,
+      street,
+      number,
+      complement,
+      neighborhood,
+      city_code,
+      city_name,
+      state_uf,
+      state_code,
+      state_name,
+      incricao_estadual,
+      incricao_municipal,
+    })
 
     const company = await dao.show(idTransaction)
 

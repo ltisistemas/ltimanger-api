@@ -9,12 +9,10 @@ export default class CompanieUsersController {
       'App/Controllers/Http/DAO/CompanyUserDaosController'
     )
 
-    // const { id } = req.body()
     const { id, company_id } = req.qs()
 
     const dao = new CompanyUserDaosController()
-    const list = await dao.index(id, company_id)
-    const qtd = (await dao.counted(id, company_id))[0].count
+    const { list, counted: qtd } = await dao.index(id, company_id)
 
     return res.json({
       status: 'success',
@@ -48,23 +46,18 @@ export default class CompanieUsersController {
         : ''
 
       const dao = new CompanyUserDaosController()
-      const idTransaction = parseInt(
-        (
-          await dao.store({
-            company_id,
-            contract_number: contract_number ?? '',
-            contract_start_date: contract_start_date ?? '',
-            contract_finish_date: contract_finish_date ?? '',
-            contract_type: contract_type ?? '',
-            name,
-            email,
-            cpf,
-            password,
-            profile,
-          })
-        )[0],
-        10
-      )
+      const idTransaction = await dao.store({
+        company_id,
+        contract_number: contract_number ?? '',
+        contract_start_date: contract_start_date ?? '',
+        contract_finish_date: contract_finish_date ?? '',
+        contract_type: contract_type ?? '',
+        name,
+        email,
+        cpf,
+        password,
+        profile,
+      })
 
       const company = await dao.show(idTransaction)
 

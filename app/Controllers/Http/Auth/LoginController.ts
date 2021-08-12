@@ -12,12 +12,12 @@ export default class LoginController extends Controller {
     )
 
     const { email, password } = req.body()
-    const dao = new UserDaoController()
+    let dao: any = new UserDaoController()
 
     let user = await dao.show(0, email)
     if (!user) {
-      const daoCompanyUser = new CompanyUserDaosController()
-      user = await daoCompanyUser.show(0, email)
+      dao = new CompanyUserDaosController()
+      user = await dao.show(0, email)
       if (!user) {
         return res.status(401).json({
           status: 'error',
@@ -29,7 +29,7 @@ export default class LoginController extends Controller {
     }
 
     // if (!(await Hash.verify(user.senha, password))) {
-    if (!bcrypt.compareSync(password, user.password)) {
+    if (!dao.doCompareHash(password, user.password)) {
       return res.status(401).json({
         status: 'error',
         code: 401,

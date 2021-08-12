@@ -162,7 +162,11 @@ export default class ConfigurationDaoController extends DaoMongoController {
     // if (email_exact !== '') params['email'] = email_exact
     if (email !== '') params['email'] = email
 
-    const row: any[] = await Database.from(this.tableName).where(params)
-    return row.length ? row[0] : null
+    const collection = await this.collection(this.tableName)
+    const result = await collection.findOne(params)
+    return result && result !== undefined ? result : null
+
+    // const row: any[] = await Database.from(this.tableName).where(params)
+    // return row.length ? row[0] : null
   }
 }
