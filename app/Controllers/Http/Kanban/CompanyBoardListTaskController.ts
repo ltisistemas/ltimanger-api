@@ -15,8 +15,7 @@ export default class CompanyBoardListTaskController {
         : 0
 
       const dao = new CompanyBoardListTaskDaoController()
-      const list = await dao.index(id, company_list_id, title)
-      const qtd = (await dao.counted(id, company_list_id, title))[0].count
+      const { list, counted: qtd } = await dao.index(id, company_list_id, title)
 
       return res.json({
         status: 'success',
@@ -52,17 +51,13 @@ export default class CompanyBoardListTaskController {
       const company_user_created_id = parseInt(user.id, 10)
       const company_list_id = parseInt(companyListId, 10)
       const dao = new CompanyBoardListTaskDaoController()
-      const idTransaction = parseInt(
-        (
-          await dao.store({
-            company_list_id,
-            company_user_created_id,
-            title,
-            description,
-          })
-        )[0],
-        10
-      )
+      const idTransaction = await dao.store({
+        company_list_id,
+        company_user_created_id,
+        title,
+        description,
+      })
+
       const finded = await dao.show(idTransaction)
       return res.json({
         status: 'success',

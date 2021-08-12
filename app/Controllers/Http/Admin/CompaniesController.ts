@@ -13,7 +13,6 @@ export default class CompaniesController {
 
     const dao = new CompanyDaosController()
     const { list, counted: qtd } = await dao.index(id)
-    // const qtd = (await dao.counted(id))[0].count
 
     return res.json({
       status: 'success',

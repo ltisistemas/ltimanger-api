@@ -59,21 +59,22 @@ export default class CompanyBoardListDaoController extends DaoMongoController {
     }
   }
 
-  public async index(id: any, company_id: any, title: any = '') {
+  public async index(id: any, company_board_id: any, title: any = '') {
     const params = {}
 
     if (id || (id !== undefined && id !== 0)) params['_id'] = this.toId(id)
-    params['company_id'] = this.toId(company_id)
+    params['company_board_id'] = this.toId(company_board_id)
     if (title && title !== '') params['title'] = title
 
     return await this.getDocuments(this.tableName, params)
   }
 
-  public async show(id: any, company_id: any, title: any = '') {
+  public async show(id: any, company_board_id: any = null, title: any = '') {
     const params = {}
 
     if (id || (id !== undefined && id !== 0)) params['_id'] = this.toId(id)
-    if (company_id && company_id !== 0) params['company_id'] = this.toId(company_id)
+    if (company_board_id && company_board_id !== 0)
+      params['company_board_id'] = this.toId(company_board_id)
     if (title && title !== '') params['title'] = title
 
     return await this.getDocument(this.tableName, params)

@@ -12,8 +12,7 @@ export default class CompanieBoardController {
     const { id, company_id } = req.qs()
 
     const dao = new CompanyBoardDaoController()
-    const list = await dao.index(id, company_id)
-    const qtd = (await dao.counted(id, company_id))[0].count
+    const { list, counted: qtd } = await dao.index(id, company_id)
 
     return res.json({
       status: 'success',
@@ -54,9 +53,10 @@ export default class CompanieBoardController {
       const finded = await dao.show(idTransaction)
       if (finded) {
         const daoConfig = new ConfigurationDaoController()
-        const listConfig = await daoConfig.index()
+        const { list: listConfig } = await daoConfig.index(null)
         const config = listConfig[0]
         const lists: any[] = config.default_list.split('|')
+
         lists.map(async (title: any) => {
           const daoList = new CompanyBoardListDaoController()
           await daoList.store({ company_board_id: idTransaction, company_user_created_id, title })

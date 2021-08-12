@@ -23,6 +23,9 @@ export default class InitialSeeder extends BaseSeeder {
     await dao.store({ name, email, password, profile })
 
     const daoConfig = new ConfigurationDaoController()
-    await daoConfig.store({ status: 'ACTIVE' })
+    await daoConfig.store({
+      status: 'ACTIVE',
+      default_list: 'BACKLOG|TO DO|ACTIVE|IMPEDIMENT|REVIEW / QA|RETURN|DONE',
+    })
   }
 }

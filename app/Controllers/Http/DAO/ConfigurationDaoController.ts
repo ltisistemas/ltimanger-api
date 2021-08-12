@@ -128,7 +128,7 @@ export default class ConfigurationDaoController extends DaoMongoController {
   public async index(id: any) {
     const params = {}
 
-    if (id || id !== undefined) params['_id'] = this.toId(id)
+    if (id && id !== undefined && id !== 0) params['_id'] = this.toId(id)
 
     return await this.getDocuments(this.tableName, params)
   }

@@ -69,11 +69,11 @@ export default class CompanyBoardListTaskDaoController extends DaoMongoControlle
     return await this.getDocuments(this.tableName, params)
   }
 
-  public async show(id = 0, company_list_id = 0, title = '') {
+  public async show(id: any, company_list_id: any = 0, title = '') {
     const params = {}
 
-    if (id || (id !== undefined && id !== 0)) params['_id'] = this.toId(id)
-    if (company_list_id && company_list_id !== 0)
+    if (id && id !== undefined && id !== 0) params['_id'] = this.toId(id)
+    if (company_list_id && company_list_id !== undefined && company_list_id !== 0)
       params['company_list_id'] = this.toId(company_list_id)
     if (title && title !== '') params['title'] = title
 

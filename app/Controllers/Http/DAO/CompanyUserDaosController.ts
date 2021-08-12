@@ -1,7 +1,4 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import Database from '@ioc:Adonis/Lucid/Database'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
 import DaoMongoController from './DaoMongoController'
 
 export default class CompanyUserDaosController extends DaoMongoController {
@@ -85,16 +82,16 @@ export default class CompanyUserDaosController extends DaoMongoController {
   }
 
   public async destroy(id: number, fields: any) {
-    const { status } = fields
-
-    const params = {
-      status,
-      updated_at: format(new Date(), 'yyyy-MM-dd HH:mm:ss', { locale: ptBR }),
-    }
-
     try {
+      const { status, company_user_updated_id } = fields
       const filter = { _id: this.toId(id) }
-      return await this.updateDocument(this.tableName, filter, params)
+      const updateDocument = {
+        company_user_updated_id: this.toId(company_user_updated_id),
+        status,
+        updated_at: this.toDateTime(),
+      }
+
+      return await this.updateDocument(this.tableName, filter, updateDocument)
     } catch (e) {
       console.log('> Erro: ', e)
       return null
@@ -108,15 +105,6 @@ export default class CompanyUserDaosController extends DaoMongoController {
     params['company_id'] = this.toId(company_id)
 
     return await this.getDocuments(this.tableName, params)
-  }
-
-  public async counted(id = 0, company_id: number) {
-    const params = {}
-
-    if (id !== 0) params['id'] = id
-    params['company_id'] = this.toId(company_id)
-
-    return Database.from(this.tableName).where(params).count('*')
   }
 
   public async show(id: any, email: any = '') {
