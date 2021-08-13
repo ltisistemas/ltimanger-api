@@ -1,6 +1,5 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Controller from 'App/Controllers/Http/Controller'
-import * as bcrypt from 'bcrypt'
 
 export default class LoginController extends Controller {
   public async store({ request: req, response: res }: HttpContextContract) {
@@ -28,7 +27,6 @@ export default class LoginController extends Controller {
       }
     }
 
-    // if (!(await Hash.verify(user.senha, password))) {
     if (!dao.doCompareHash(password, user.password)) {
       return res.status(401).json({
         status: 'error',

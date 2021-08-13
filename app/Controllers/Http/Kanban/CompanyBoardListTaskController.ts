@@ -47,9 +47,8 @@ export default class CompanyBoardListTaskController {
     )
 
     try {
-      const { company_list_id: companyListId, title, description } = req.body()
-      const company_user_created_id = parseInt(user.id, 10)
-      const company_list_id = parseInt(companyListId, 10)
+      const { company_list_id, title, description } = req.body()
+      const company_user_created_id = user.id
       const dao = new CompanyBoardListTaskDaoController()
       const idTransaction = await dao.store({
         company_list_id,

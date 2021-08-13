@@ -3,6 +3,11 @@ import Env from '@ioc:Adonis/Core/Env'
 import * as mongo from 'mongodb'
 import GlobalDaoController from './GlobalDaoController'
 
+export interface LookupModel {
+  using: boolean,
+  aggregate?: any | null
+}
+
 export default class DaoMongoController extends GlobalDaoController {
   protected client: MongoClient
 
@@ -27,8 +32,16 @@ export default class DaoMongoController extends GlobalDaoController {
   public toId(id: any) {
     return new mongo.ObjectId(id)
   }
-  public async getDocuments(tableName: string, params: any) {
+  public async getDocuments(tableName: string, params: any, lookup: LookupModel = { using: false }) {
     const collection = await this.collection(tableName)
+
+
+    if (lookup.using) {
+      const result = collection.aggregate(lookup.aggregate)
+      const list = await result.toArray()
+      return { list, counted: await list.length }
+    }
+
     const result = collection.find(params)
     return { list: await result.toArray(), counted: await result.count() }
   }

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import DaoMongoController from './DaoMongoController'
+import DaoMongoController, { LookupModel } from './DaoMongoController'
 
 export default class CompanyBoardListDaoController extends DaoMongoController {
   protected tableName = 'company_lists'
@@ -59,14 +59,45 @@ export default class CompanyBoardListDaoController extends DaoMongoController {
     }
   }
 
-  public async index(id: any, company_board_id: any, title: any = '') {
+  public async index(id: any = 0, company_board_id: any, title: any = '') {
     const params = {}
 
     if (id || (id !== undefined && id !== 0)) params['_id'] = this.toId(id)
     params['company_board_id'] = this.toId(company_board_id)
     if (title && title !== '') params['title'] = title
 
-    return await this.getDocuments(this.tableName, params)
+    const aggregate = [
+      {
+        '$match': {
+          company_board_id: this.toId(company_board_id),
+          _id: (id || (id !== undefined && id !== 0)) ? this.toId(id) : null,
+          title: title && title !== '' ? title : null
+        }
+      }, {
+        '$lookup': {
+          'from': 'company_list_tasks',
+          'foreignField': 'company_list_id',
+          'localField': '_id',
+          'as': 'list_tasks'
+        }
+      }
+    ]
+
+    if (!aggregate[0].$match?.title) {
+      delete aggregate[0].$match?.title
+    }
+    if (!aggregate[0].$match?._id) {
+      delete aggregate[0].$match?._id
+    }
+
+    const lookup: LookupModel = {
+      using: true,
+      aggregate
+    }
+
+    const result = await this.getDocuments(this.tableName, params, lookup)
+
+    return result
   }
 
   public async show(id: any, company_board_id: any = null, title: any = '') {
