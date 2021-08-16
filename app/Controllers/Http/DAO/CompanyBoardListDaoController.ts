@@ -66,21 +66,22 @@ export default class CompanyBoardListDaoController extends DaoMongoController {
     params['company_board_id'] = this.toId(company_board_id)
     if (title && title !== '') params['title'] = title
 
-    const aggregate = [
+    const aggregate: any = [
       {
-        '$match': {
+        $match: {
           company_board_id: this.toId(company_board_id),
-          _id: (id || (id !== undefined && id !== 0)) ? this.toId(id) : null,
-          title: title && title !== '' ? title : null
-        }
-      }, {
-        '$lookup': {
-          'from': 'company_list_tasks',
-          'foreignField': 'company_list_id',
-          'localField': '_id',
-          'as': 'list_tasks'
-        }
-      }
+          _id: id || (id !== undefined && id !== 0) ? this.toId(id) : null,
+          title: title && title !== '' ? title : null,
+        },
+      },
+      {
+        $lookup: {
+          from: 'company_list_tasks',
+          foreignField: 'company_list_id',
+          localField: '_id',
+          as: 'list_tasks',
+        },
+      },
     ]
 
     if (!aggregate[0].$match?.title) {
@@ -92,7 +93,7 @@ export default class CompanyBoardListDaoController extends DaoMongoController {
 
     const lookup: LookupModel = {
       using: true,
-      aggregate
+      aggregate,
     }
 
     const result = await this.getDocuments(this.tableName, params, lookup)

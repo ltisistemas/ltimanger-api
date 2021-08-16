@@ -34,7 +34,7 @@ export default class UserDaoController extends DaoMongoController {
   public async show(id: any, email_exact: any = '', email: any = '') {
     const params = {}
 
-    if (id && id !== 0) params['_id'] = id
+    if (id || (id !== undefined && id !== 0)) params['_id'] = this.toId(id)
     if (email_exact && email_exact !== '') params['email'] = email_exact
     if (email && email !== '') params['email'] = email
 

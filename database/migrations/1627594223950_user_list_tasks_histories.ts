@@ -1,7 +1,7 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 
 export default class UserListTasksHistories extends BaseSchema {
-  protected tableName = 'user_list_tasks_histories'
+  protected tableName = 'company_list_tasks_history'
 
   public async up() {
     this.schema.createTable(this.tableName, (table) => {

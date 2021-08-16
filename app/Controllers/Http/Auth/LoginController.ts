@@ -9,22 +9,23 @@ export default class LoginController extends Controller {
     const { default: CompanyUserDaosController } = await import(
       'App/Controllers/Http/DAO/CompanyUserDaosController'
     )
+    const { default: UserAuthController } = await import(
+      'App/Controllers/Http/Auth/UserAuthController'
+    )
 
     const { email, password } = req.body()
     let dao: any = new UserDaoController()
 
-    let user = await dao.show(0, email)
+    const daoUserAuth = new UserAuthController()
+
+    const user = await daoUserAuth.authUser(0, email)
     if (!user) {
-      dao = new CompanyUserDaosController()
-      user = await dao.show(0, email)
-      if (!user) {
-        return res.status(401).json({
-          status: 'error',
-          code: 401,
-          message: 'User / Password not found',
-          data: {},
-        })
-      }
+      return res.status(401).json({
+        status: 'error',
+        code: 401,
+        message: 'User / Password not found',
+        data: {},
+      })
     }
 
     if (!dao.doCompareHash(password, user.password)) {
@@ -40,7 +41,7 @@ export default class LoginController extends Controller {
     const payload = {
       iat: Math.floor(Date.now() / 1000) - 30,
       exp: Math.floor(Date.now() / 1000) + 60 * 60 * 12,
-      sub: user.codigo,
+      sub: user._id,
     }
     const token = this.jwtEncode(payload)
     user.token = token

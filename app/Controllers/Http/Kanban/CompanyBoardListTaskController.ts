@@ -45,10 +45,13 @@ export default class CompanyBoardListTaskController {
     const { default: CompanyBoardListTaskDaoController } = await import(
       'App/Controllers/Http/DAO/CompanyBoardListTaskDaoController'
     )
+    const { default: CompanyBoardListTaskHistoryDaoController } = await import(
+      'App/Controllers/Http/DAO/CompanyBoardListTaskHistoryDaoController'
+    )
 
     try {
       const { company_list_id, title, description } = req.body()
-      const company_user_created_id = user.id
+      const company_user_created_id = user._id
       const dao = new CompanyBoardListTaskDaoController()
       const idTransaction = await dao.store({
         company_list_id,
@@ -56,6 +59,9 @@ export default class CompanyBoardListTaskController {
         title,
         description,
       })
+
+      const daoHistory = new CompanyBoardListTaskHistoryDaoController()
+      await daoHistory.store({ company_user_id: user._id, company_list_tasks_id: idTransaction })
 
       const finded = await dao.show(idTransaction)
       return res.json({
