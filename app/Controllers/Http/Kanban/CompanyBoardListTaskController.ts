@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { HistoryType } from 'App/Models/User'
 
 export default class CompanyBoardListTaskController {
   public async index({ request: req, response: res }: HttpContextContract) {
@@ -61,7 +62,12 @@ export default class CompanyBoardListTaskController {
       })
 
       const daoHistory = new CompanyBoardListTaskHistoryDaoController()
-      await daoHistory.store({ company_user_id: user._id, company_list_tasks_id: idTransaction })
+      await daoHistory.store({
+        company_user_id: user._id,
+        company_list_tasks_id: idTransaction,
+        history_type: HistoryType.CREATED,
+        message: `${user.name} criou o CARD: ${title}`,
+      })
 
       const finded = await dao.show(idTransaction)
       return res.json({
@@ -80,12 +86,18 @@ export default class CompanyBoardListTaskController {
       })
     }
   }
-  public async update({ request: req, response: res, params }: HttpContextContract) {
+  public async update({ request: req, response: res, params, user }: HttpContextContract) {
     const { default: CompanyBoardListTaskDaoController } = await import(
       'App/Controllers/Http/DAO/CompanyBoardListTaskDaoController'
     )
-    const { id: codigo } = params
-    const id = parseInt(codigo, 10)
+    const { default: CompanyBoardListTaskHistoryDaoController } = await import(
+      'App/Controllers/Http/DAO/CompanyBoardListTaskHistoryDaoController'
+    )
+    const { default: CompanyBoardListDaoController } = await import(
+      'App/Controllers/Http/DAO/CompanyBoardListDaoController'
+    )
+
+    const { id } = params
     const dao = new CompanyBoardListTaskDaoController()
 
     const finded = await dao.show(id)
@@ -98,9 +110,15 @@ export default class CompanyBoardListTaskController {
       })
     }
 
-    const { title, description } = req.body()
+    const { company_list_id, title, description } = req.body()
 
-    const affectedRows = await dao.update(id, { title, description })
+    const affectedRows = await dao.update(id, {
+      company_user_updated_id: user.id,
+      company_list_id,
+      title,
+      description,
+    })
+
     if (!affectedRows) {
       return res.status(400).json({
         status: 'error',
@@ -109,6 +127,21 @@ export default class CompanyBoardListTaskController {
         code: 400,
       })
     }
+
+    const daoOrigin = new CompanyBoardListDaoController()
+    const origin = await daoOrigin.show(finded.company_list_id)
+    const target = await daoOrigin.show(company_list_id)
+
+    const daoHistory = new CompanyBoardListTaskHistoryDaoController()
+    await daoHistory.store({
+      company_user_id: user._id,
+      company_list_tasks_id: id,
+      history_type: HistoryType.MOVED,
+      message: `${user.name} moveu o CARD ${title ?? finded?.title}: de ${origin?.title} para ${
+        target?.title
+      }`,
+    })
+
     return res.json({
       status: 'success',
       message: 'Operação realizda com sucesso',

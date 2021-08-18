@@ -35,7 +35,6 @@ export default class Auth {
       const daoUserAuth = new UserAuthController()
 
       const user = await daoUserAuth.authUser(payload.sub)
-      console.log('> Payload', payload, user)
       if (!user) {
         return res.status(401).json({ status: 'error', message: 'Token invalid' })
       }

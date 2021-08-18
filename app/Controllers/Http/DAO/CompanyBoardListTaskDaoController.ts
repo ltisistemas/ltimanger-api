@@ -26,14 +26,18 @@ export default class CompanyBoardListTaskDaoController extends DaoMongoControlle
 
   public async update(id: number, fields: any) {
     try {
-      const { company_user_updated_id, title, description } = fields
+      const { company_user_updated_id, company_list_id, title, description } = fields
       const filter = { _id: this.toId(id) }
       const updateDocument = {
         company_user_updated_id: this.toId(company_user_updated_id),
-        title,
-        description,
         updated_at: this.toDateTime(),
       }
+
+      if (fields.hasOwnProperty('company_list_id'))
+        updateDocument['company_list_id'] = this.toId(company_list_id)
+      if (title && title !== undefined && title !== '') updateDocument['title'] = title
+      if (description && description !== undefined && description !== '')
+        updateDocument['description'] = description
 
       return await this.updateDocument(this.tableName, filter, updateDocument)
     } catch (e) {

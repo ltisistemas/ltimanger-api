@@ -58,7 +58,7 @@ export default class CompanyUserDaosController extends DaoMongoController {
     } = fields
 
     const params = {
-      company_id,
+      company_id: this.toId(company_id),
       contract_number,
       contract_start_date,
       contract_finish_date,

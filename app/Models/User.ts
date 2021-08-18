@@ -11,3 +11,9 @@ export default class User extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 }
+
+export enum HistoryType {
+  'CREATED' = 'CREATED',
+  'MOVED' = 'MOVED',
+  'ARCHIVE' = 'ARCHIVE',
+}

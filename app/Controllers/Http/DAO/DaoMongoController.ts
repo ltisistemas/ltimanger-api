@@ -4,7 +4,7 @@ import * as mongo from 'mongodb'
 import GlobalDaoController from './GlobalDaoController'
 
 export interface LookupModel {
-  using: boolean,
+  using: boolean
   aggregate?: any | null
 }
 
@@ -32,9 +32,12 @@ export default class DaoMongoController extends GlobalDaoController {
   public toId(id: any) {
     return new mongo.ObjectId(id)
   }
-  public async getDocuments(tableName: string, params: any, lookup: LookupModel = { using: false }) {
+  public async getDocuments(
+    tableName: string,
+    params: any,
+    lookup: LookupModel = { using: false }
+  ) {
     const collection = await this.collection(tableName)
-
 
     if (lookup.using) {
       const result = collection.aggregate(lookup.aggregate)
@@ -58,7 +61,7 @@ export default class DaoMongoController extends GlobalDaoController {
   }
   public async updateDocument(tableName: string, filter = {}, updateDocument = {}) {
     const collection = await this.collection(tableName)
-    const result = await collection.updateOne(filter, updateDocument)
+    const result = await collection.updateOne(filter, { $set: updateDocument }, { upsert: true })
     return result.modifiedCount
   }
 }

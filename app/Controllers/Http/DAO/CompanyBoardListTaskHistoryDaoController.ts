@@ -6,10 +6,12 @@ export default class CompanyBoardListTaskHistoryDaoController extends DaoMongoCo
 
   public async store(fields: any) {
     try {
-      const { company_user_id, company_list_tasks_id } = fields
+      const { company_user_id, company_list_tasks_id, history_type, message } = fields
       const params = {
         company_user_id: this.toId(company_user_id),
         company_list_tasks_id,
+        history_type: history_type,
+        message,
         created_at: this.toDateTime(),
         updated_at: this.toDateTime(),
       }

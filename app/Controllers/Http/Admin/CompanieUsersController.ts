@@ -13,6 +13,10 @@ export default class CompanieUsersController {
 
     const dao = new CompanyUserDaosController()
     const { list, counted: qtd } = await dao.index(id, company_id)
+    list.map(user => {
+      delete user.password
+      return user
+    })
 
     return res.json({
       status: 'success',
@@ -82,8 +86,7 @@ export default class CompanieUsersController {
       'App/Controllers/Http/DAO/CompanyUserDaosController'
     )
 
-    const { id: codigo } = params
-    const id = parseInt(codigo, 10)
+    const { id } = params
     const dao = new CompanyUserDaosController()
     const finded = await dao.show(id)
     if (!finded) {
@@ -144,8 +147,7 @@ export default class CompanieUsersController {
       'App/Controllers/Http/DAO/CompanyUserDaosController'
     )
 
-    const { id: codigo } = params
-    const id = parseInt(codigo, 10)
+    const { id } = params
     const dao = new CompanyUserDaosController()
     const finded = await dao.show(id)
     if (!finded) {
