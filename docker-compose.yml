@@ -4,32 +4,56 @@ services:
     build: .
     container_name: api
     ports:
-      - '8001:3333'
+      - '3333:3333'
     restart: unless-stopped
     command: yarn dev
     volumes:
       - ./:/api
     depends_on:
-      - db
+      - mongodb
     networks:
       - lti_network
-  db:
-    image: mysql:8.0.23
-    container_name: db
-    environment:
-      MYSQL_DATABASE: ltimanger
-      MYSQL_ROOT_PASSWORD: 7hoCenezOsod3lspuspeSwlphuBRat
-      MYSQL_PASSWORD: 7hoCenezOsod3lspuspeSwlphuBRat
-      MYSQL_USER: ltisistemas
-      SERVICE_TAGS: dev
-      SERVICE_NAME: mysql
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: unless-stopped
     volumes:
-      - ./.docker/mysql:/var/lib/mysql
-    ports:
-      - '3306:3306'
+      - /.docker/mongodb:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ltisistemas
+      MONGO_INITDB_ROOT_PASSWORD: T3tjAfye8KMN404o
     networks:
       - lti_network
-    command: --default-authentication-plugin=mysql_native_password
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    depends_on:
+      - mongodb
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ltisistemas
+      ME_CONFIG_MONGODB_ADMINPASSWORD: T3tjAfye8KMN404o
+      ME_CONFIG_MONGODB_URL: mongodb://ltisistemas:T3tjAfye8KMN404o@mongodb:27017/?retryWrites=true&w=majority
+    networks:
+      - lti_network
+  # db:
+  #   image: mysql:8.0.23
+  #   container_name: db
+  #   environment:
+  #     MYSQL_DATABASE: ltimanger
+  #     MYSQL_ROOT_PASSWORD: 7hoCenezOsod3lspuspeSwlphuBRat
+  #     MYSQL_PASSWORD: 7hoCenezOsod3lspuspeSwlphuBRat
+  #     MYSQL_USER: ltisistemas
+  #     SERVICE_TAGS: dev
+  #     SERVICE_NAME: mysql
+  #   volumes:
+  #     - ./.docker/mysql:/var/lib/mysql
+  #   ports:
+  #     - '3306:3306'
+  #   networks:
+  #     - lti_network
+  #   command: --default-authentication-plugin=mysql_native_password
 networks:
   lti_network:
     driver: bridge
