@@ -66,7 +66,7 @@ export default class CompanyBoardListDaoController extends DaoMongoController {
     params['company_board_id'] = this.toId(company_board_id)
     if (title && title !== '') params['title'] = title
 
-    const aggregate: any = [
+    const nested: any = [
       {
         $match: {
           company_board_id: this.toId(company_board_id),
@@ -77,23 +77,58 @@ export default class CompanyBoardListDaoController extends DaoMongoController {
       {
         $lookup: {
           from: 'company_list_tasks',
-          foreignField: 'company_list_id',
-          localField: '_id',
+          let: { listid: '$_id' },
+          pipeline: [
+            { $match: { $expr: { $eq: ['$company_list_id', '$$listid'] } } },
+            {
+              $lookup: {
+                from: 'company_list_tasks_history',
+                let: { taskid: '$_id' },
+                pipeline: [{ $match: { $expr: { $eq: ['$company_list_tasks_id', '$$taskid'] } } }],
+                as: 'task_history',
+              },
+            },
+          ],
           as: 'list_tasks',
         },
       },
     ]
 
-    if (!aggregate[0].$match?.title) {
-      delete aggregate[0].$match?.title
+    // const aggregate: any = [
+    //   {
+    //     $match: {
+    //       company_board_id: this.toId(company_board_id),
+    //       _id: id || (id !== undefined && id !== 0) ? this.toId(id) : null,
+    //       title: title && title !== '' ? title : null,
+    //     },
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'company_list_tasks',
+    //       foreignField: 'company_list_id',
+    //       localField: '_id',
+    //       as: 'list_tasks',
+    //     },
+    //   },
+    // ]
+
+    // if (!aggregate[0].$match?.title) {
+    //   delete aggregate[0].$match?.title
+    // }
+    // if (!aggregate[0].$match?._id) {
+    //   delete aggregate[0].$match?._id
+    // }
+
+    if (!nested[0].$match?.title) {
+      delete nested[0].$match?.title
     }
-    if (!aggregate[0].$match?._id) {
-      delete aggregate[0].$match?._id
+    if (!nested[0].$match?._id) {
+      delete nested[0].$match?._id
     }
 
     const lookup: LookupModel = {
       using: true,
-      aggregate,
+      aggregate: nested,
     }
 
     const result = await this.getDocuments(this.tableName, params, lookup)

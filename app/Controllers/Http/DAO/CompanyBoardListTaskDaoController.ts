@@ -33,7 +33,7 @@ export default class CompanyBoardListTaskDaoController extends DaoMongoControlle
         updated_at: this.toDateTime(),
       }
 
-      if (fields.hasOwnProperty('company_list_id'))
+      if (company_list_id && company_list_id !== undefined && company_list_id !== '')
         updateDocument['company_list_id'] = this.toId(company_list_id)
       if (title && title !== undefined && title !== '') updateDocument['title'] = title
       if (description && description !== undefined && description !== '')
