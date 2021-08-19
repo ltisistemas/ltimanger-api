@@ -38,9 +38,8 @@ export default class CompanieBoardController {
     )
 
     try {
-      const { company_id: companyId, title, description } = req.body()
-      const company_user_created_id = parseInt(user._id, 10)
-      const company_id = parseInt(companyId, 10)
+      const { company_id, title, description } = req.body()
+      const company_user_created_id = user._id
 
       const dao = new CompanyBoardDaoController()
       const idTransaction = await dao.store({

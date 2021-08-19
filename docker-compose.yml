@@ -24,17 +24,29 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: T3tjAfye8KMN404o
     networks:
       - lti_network
-  mongo-express:
-    image: mongo-express
+  # mongo-express:
+  #   image: mongo-express
+  #   restart: always
+  #   ports:
+  #     - 8081:8081
+  #   depends_on:
+  #     - mongodb
+  #   environment:
+  #     ME_CONFIG_MONGODB_ADMINUSERNAME: ltisistemas
+  #     ME_CONFIG_MONGODB_ADMINPASSWORD: T3tjAfye8KMN404o
+  #     ME_CONFIG_MONGODB_URL: mongodb://ltisistemas:T3tjAfye8KMN404o@mongodb:27017/?retryWrites=true&w=majority
+  #   networks:
+  #     - lti_network
+  mongo-gui:
+    container_name: "mongo-gui"
+    image: ugleiton/mongo-gui
     restart: always
     ports:
-      - 8081:8081
+      - "4321:4321"
     depends_on:
       - mongodb
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: ltisistemas
-      ME_CONFIG_MONGODB_ADMINPASSWORD: T3tjAfye8KMN404o
-      ME_CONFIG_MONGODB_URL: mongodb://ltisistemas:T3tjAfye8KMN404o@mongodb:27017/?retryWrites=true&w=majority
+      - MONGO_URL=mongodb://ltisistemas:T3tjAfye8KMN404o@mongodb:27017/?retryWrites=true&w=majority
     networks:
       - lti_network
   # db:
